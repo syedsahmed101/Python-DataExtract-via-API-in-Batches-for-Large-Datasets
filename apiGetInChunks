@@ -1,9 +1,7 @@
 # Import required python modules
 import sys
-from datetime import datetime
 import requests
 import json
-import pandas as pd
 
 # API Call
 def api_call(method, url, account, pwd):
