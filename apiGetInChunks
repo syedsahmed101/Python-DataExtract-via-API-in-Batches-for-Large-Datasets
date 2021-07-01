@@ -1,0 +1,60 @@
+# Import required python modules
+import sys
+from datetime import datetime
+import requests
+import json
+import pandas as pd
+
+# API Call
+def api_call(method, url, account, pwd):
+  header = {'Content-Type': 'application/json'}
+    
+  try:
+    ask = requests.request('Get', url, headers=header, auth=(account, pwd), verify=False)
+    ask.raise_for_status()
+    if ask:
+      response = ask.json()
+    else:
+      response = ''
+    return reponse
+    
+  except requests.exceptions.HTTPError as errh:
+    return "An Http Error occurred:" + repr(errh)
+  except requests.exceptions.ConnectionError as errc:
+    return "An Error Connecting to the API occurred:" + repr(errc)
+  except requests.exceptions.Timeout as errt:
+    return "A Timeout Error occurred:" + repr(errt)
+  except requests.exceptions.RequestException as err:
+    return "An Unknown Error occurred" + repr(err)   
+
+def get_data(hostUrl, account, pwd):
+  fullUrl = hostUrl + '/api/v1/testresult'
+  limit = 50 # This is batch or chunk size. Modify the size according to the performance.
+  offset = 0 # From what json record position or item should the api begin reading data. In this case, we are reading from the begining.
+  
+  # Continue calling the API and increment offset in infinite loop until no output is returned.
+  while 1:
+    queryString = "?limit=" + str(limit) + "&offset=" + str(offset)
+    response = api_call('get', fullUrl + queryString, account, pwd)
+    if response is not None:
+      if len(response) > 0:
+        parse_data(response)
+      else:
+        break;
+    else:
+      break;
+    offset = offset + limit
+    
+def getPasswordFromVault(account):
+  # Add code to retrieve passowrd from your organizations secured password vault instead of hard-coding it in the code.
+    
+def parse_data(response):
+  # Add any parsing logic here
+
+def main():
+  account = 'abc'
+  pwd = getPasswordFromVault(account)
+  get_data(sys.argv[1], account, pwd)
+
+if __name__ == '__main__':
+  main()
